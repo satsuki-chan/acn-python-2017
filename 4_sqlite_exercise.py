@@ -48,24 +48,13 @@ class dbStudent:
     def db_add_student(self, in_student_values):
         db_s_count = self.db_read_one_query("SELECT COUNT(S.id) FROM students as S")
         i_id = int(db_s_count[0]) + 1
-        #print("{0}".format(i_id))
-        #if self.db_connection:
-        #    self.db_connection.close()
         self.db_close()
-        #t_values = (i_id, in_student_values[0], in_student_values[1], in_student_values[2], in_student_values[3])
-        #print(t_values)
         s_insert = "INSERT INTO students VALUES (" + str(i_id) + ", '" + in_student_values[0] + "', '" + in_student_values[1] + "', '" + in_student_values[2] + "', " + str(in_student_values[3]) + ")"
-        #s_insert = "INSERT INTO students VALUES (?, ?, ?, ?, ?)"
-        ##
         self.db_connection = sqlite3.connect(self.db_student)
         self.db_connection.text_factory = str
         with self.db_connection:
             db_cursor = self.db_connection.cursor()
-            #db_cursor.execute(s_insert, t_values)
             db_cursor.execute(s_insert)
-            #return db_cursor.fetchone()
-            #return db_cursor.fetchall()
-            ##print("The last Id of the inserted row is {0}".format(db_cursor.lastrowid))
             return db_cursor.lastrowid
 
     def db_close(self):
@@ -95,10 +84,7 @@ while (in_answer == 'y' or in_answer == 'Y'):
         print("\n --- Student --- --- Teacher ---")
         for s_q_rom in s_q_result:
             print("{0:<12} - {1:<12}".format(s_q_rom[0], (str(s_q_rom[1]) + " - " + s_q_rom[2])))
-
-    #s_q_students = "SELECT COUNT(S.id) FROM students as S"
-
-    #t_values = ()
+    # - Add a new student - #
     in_n_student = raw_input("Do you want to add a new student (Y/N)?: ")
     if in_n_student == 'y' or in_n_student == 'Y':
         in_s_name = raw_input("Student's name: ")
@@ -106,10 +92,16 @@ while (in_answer == 'y' or in_answer == 'Y'):
         in_s_bday = raw_input("Student's birthday [YYYY-MM-DD]: ")
         in_s_t_id = raw_input("Teacher's ID: ")
         l_s_values = [in_s_name, in_s_lname, in_s_bday, int(in_s_t_id)]
-        #s_q_result = myStudentBD.db_add_student(l_s_values)
-        myStudentBD.db_add_student(l_s_values)
-#        if s_q_result:
-#            print(s_q_result)
-
+        i_last_sid = myStudentBD.db_add_student(l_s_values)
+        if i_last_sid:
+            s_q_students = "SELECT * FROM students as S WHERE S.id = " + str(i_last_sid)
+            s_q_result = myStudentBD.db_read_one_query(s_q_students)
+            if s_q_result:
+                print(s_q_result)
+                print("{0:<25} - {1:<20} - {2:<18}".format(
+                    ("[" + str(s_q_result[0]) + "] " + s_q_result[1] + " " + s_q_result[2]),
+                    ("Birthday: " + s_q_result[3]),
+                    ("Teacher's ID: " + str(s_q_result[4])))
+                )
 
     in_answer = raw_input("Do you want to read again from the Students' database (Y/N)?: ")
