@@ -65,11 +65,12 @@ class dbStudent:
 
 ## - Main script - ##
 in_answer = "Y"
+# - Opening connection with the database - #
+myStudentBD = dbStudent('school.db')
 while (in_answer == 'y' or in_answer == 'Y'):
     print "Accenture Big Data Academy - November 2017"
     print "4. Script lo list students information from a SQLite database."
 
-    myStudentBD = dbStudent('school.db')
     # - Students and their subjects - #
     s_q_students = "SELECT S.id, S.first_name, S.last_name, C.id as course_id, C.description as course FROM students as S LEFT JOIN student_courses as SC on S.id = SC.student_id LEFT JOIN courses as C on SC.course_id = C.id ORDER BY S.first_name, S.last_name, C.description"
     s_q_result = myStudentBD.db_read_query(s_q_students)
@@ -98,10 +99,14 @@ while (in_answer == 'y' or in_answer == 'Y'):
             s_q_result = myStudentBD.db_read_one_query(s_q_students)
             if s_q_result:
                 print(s_q_result)
-                print("{0:<25} - {1:<20} - {2:<18}".format(
+                print("\n{0:<25} - {1:<20} - {2:<18}\n".format(
                     ("[" + str(s_q_result[0]) + "] " + s_q_result[1] + " " + s_q_result[2]),
                     ("Birthday: " + s_q_result[3]),
                     ("Teacher's ID: " + str(s_q_result[4])))
                 )
+    else:
+        print("\n")
 
     in_answer = raw_input("Do you want to read again from the Students' database (Y/N)?: ")
+# - Closing database - #
+myStudentBD.db_close()
